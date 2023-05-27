@@ -1,23 +1,65 @@
 {
-    "root": true,
-    "parser": "@typescript-eslint/parser",
-    "env": { "node": true },
-    "plugins": [
-      "@typescript-eslint"
-    ],
-    "extends": [
-      "eslint:recommended",
-      "plugin:@typescript-eslint/eslint-recommended",
-      "plugin:@typescript-eslint/recommended"
-    ], 
-    "parserOptions": {
-        "sourceType": "module"
+  "root": true,
+
+  "parser": "@typescript-eslint/parser",
+
+  "env": { "node": true },
+
+  "plugins": ["@typescript-eslint"],
+
+  "extends": [
+    "airbnb-base",
+    "eslint:recommended",
+    "plugin:@typescript-eslint/eslint-recommended",
+    "plugin:@typescript-eslint/recommended",
+    "prettier"
+  ],
+
+  "settings": {
+    "import/parsers": {
+      "@typescript-eslint/parser": [".ts", ".tsx"]
     },
-    "rules": {
-      "no-unused-vars": "off",
-      "@typescript-eslint/no-unused-vars": ["error", { "args": "none" }],
-      "@typescript-eslint/ban-ts-comment": "off",
-      "no-prototype-builtins": "off",
-      "@typescript-eslint/no-empty-function": "off"
-    } 
+
+    "import/resolver": {
+      "typescript": {
+        "alwaysTryTypes": true
+      }
+    }
+  },
+
+  "parserOptions": {
+    "sourceType": "module"
+  },
+
+  "rules": {
+    "@typescript-eslint/ban-ts-comment": "off",
+
+    "quotes": ["error", "double", { "allowTemplateLiterals": true }],
+
+    "no-prototype-builtins": "off",
+    "@typescript-eslint/no-empty-function": "off",
+
+    "consistent-return": "warn",
+
+    "no-unused-vars": "off",
+    "@typescript-eslint/no-unused-vars": [
+      "warn",
+      { "argsIgnorePattern": "^_", "destructuredArrayIgnorePattern": "^_" }
+    ],
+
+    "max-classes-per-file": "off",
+
+    "import/extensions": [
+      "error",
+      "ignorePackages",
+      {
+        "ts": "never",
+        "tsx": "never",
+        "mts": "never",
+        "cts": "never"
+      }
+    ],
+
+    "no-use-before-define": "off"
   }
+}
