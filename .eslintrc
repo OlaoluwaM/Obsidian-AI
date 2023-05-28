@@ -60,6 +60,9 @@
       }
     ],
 
-    "no-use-before-define": "off"
+    "no-use-before-define": "off",
+    "no-useless-constructor": "off",
+
+    "class-methods-use-this": "off"
   }
 }

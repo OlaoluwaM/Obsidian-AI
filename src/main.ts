@@ -8,14 +8,22 @@ import {
   PluginSettingTab,
   Setting,
 } from "obsidian";
-import { EmptyObject } from "./types";
-import { DEFAULT_SETTINGS, Settings } from "./settings";
+import { EmptyObject, Mutable } from "./types";
+import { DEFAULT_SETTINGS, Settings, isDefaultSettings } from "./settings";
+import { sendNotificationStr } from "./lib/obsidian";
 
 export default class ObsidianAI extends Plugin {
-  settings: Settings;
+  settings: Mutable<Settings>;
 
   async onload() {
     await this.loadSettings();
+
+    // This adds a settings tab so the user can configure various aspects of the plugin
+    this.addSettingTab(new SettingsTab(this.app, this));
+
+    // if (isDefaultSettings(this.settings)) {
+    //   return;
+    // }
 
     // This creates an icon in the left ribbon.
     const ribbonIconEl = this.addRibbonIcon(
@@ -23,7 +31,7 @@ export default class ObsidianAI extends Plugin {
       "Obsidian AI",
       (evt: MouseEvent) => {
         // Called when the user clicks the icon.
-        new Notice("This is a notice!");
+        sendNotificationStr("This is a notice!");
       }
     );
     // Perform additional things with the ribbon
@@ -69,9 +77,6 @@ export default class ObsidianAI extends Plugin {
         }
       },
     });
-
-    // This adds a settings tab so the user can configure various aspects of the plugin
-    this.addSettingTab(new SettingsTab(this.app, this));
 
     // If the plugin hooks up any global DOM events (on parts of the app that doesn't belong to this plugin)
     // Using this function will automatically remove the event listener when this plugin is disabled.
@@ -131,12 +136,12 @@ class SettingsTab extends PluginSettingTab {
       .addText(text =>
         text
           .setPlaceholder("")
-          .setValue(this.plugin.settings.openAIAPIKey)
+          .setValue(this.plugin.settings.openAiApiKey)
           .onChange(async value => {
-            this.plugin.settings.openAIAPIKey = value;
+            this.plugin.settings.openAiApiKey = value;
             await this.plugin.saveSettings();
           })
-      )
+      );
 
     new Setting(containerEl)
       .setName("Use LocalStorage (Recommended)")
