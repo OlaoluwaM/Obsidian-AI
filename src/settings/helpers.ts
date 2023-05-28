@@ -17,7 +17,7 @@ export function getItemFromLocalStorageSafely<Sch extends AnySchema>(schema: Sch
     );
 }
 
-export function setItemInLocalStorageSafely<Item>(item: Item) {
-  return (key: string) =>
+export function setItemInLocalStorageSafely(key: string) {
+  return <Item>(item: Item) =>
     Effect.sync(() => localStorage.setItem(key, smartStringify(item)));
 }

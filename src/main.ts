@@ -1,29 +1,40 @@
+import * as Effect from "@effect/io/Effect";
+
 import {
   App,
   Editor,
   MarkdownView,
   Modal,
-  Notice,
   Plugin,
   PluginSettingTab,
   Setting,
 } from "obsidian";
 import { EmptyObject, Mutable } from "./types";
-import { DEFAULT_SETTINGS, Settings, isDefaultSettings } from "./settings";
+import {
+  DEFAULT_SETTINGS,
+  Settings,
+  getSettingsFromLocalStorageSafely,
+  isDefaultSettings,
+  saveSettingsIntoLocalStorageSafely,
+} from "./settings";
 import { sendNotificationStr } from "./lib/obsidian";
 
 export default class ObsidianAI extends Plugin {
   settings: Mutable<Settings>;
 
   async onload() {
-    await this.loadSettings();
+    this.loadSettings();
 
     // This adds a settings tab so the user can configure various aspects of the plugin
     this.addSettingTab(new SettingsTab(this.app, this));
 
-    // if (isDefaultSettings(this.settings)) {
-    //   return;
-    // }
+    if (isDefaultSettings(this.settings)) {
+      sendNotificationStr(
+        "Hi! Thanks for installing Obsidian AI. To unleash the power of AI onto your digital brain/garden, please configure your settings. Thanks and enjoy!",
+        0
+      );
+      return;
+    }
 
     // This creates an icon in the left ribbon.
     const ribbonIconEl = this.addRibbonIcon(
@@ -92,15 +103,16 @@ export default class ObsidianAI extends Plugin {
 
   onunload() {}
 
-  async loadSettings() {
-    this.settings = {
-      ...DEFAULT_SETTINGS,
-      ...(await this.loadData()),
-    };
+  loadSettings() {
+    this.settings = Effect.runSync(getSettingsFromLocalStorageSafely());
   }
 
   async saveSettings() {
-    await this.saveData(this.settings);
+    Effect.runSync(saveSettingsIntoLocalStorageSafely(this.settings));
+
+    await this.saveData({
+      message: "Settings are saved in local storage",
+    });
   }
 }
 
@@ -141,18 +153,6 @@ class SettingsTab extends PluginSettingTab {
             this.plugin.settings.openAiApiKey = value;
             await this.plugin.saveSettings();
           })
-      );
-
-    new Setting(containerEl)
-      .setName("Use LocalStorage (Recommended)")
-      .setDesc(
-        "Store your OpenAI API key in LocalStorage instead of disk. This is recommended unless you use secure syncing mechanisms like Obsidian Sync that safely encrypt your data all the way through. In other cases, like with Obsidian Git, you run the risk of having your API key stolen as settings are not encrypted when written to disk"
-      )
-      .addToggle(toggle =>
-        toggle.setValue(this.plugin.settings.useLocalStorage).onChange(async value => {
-          this.plugin.settings.useLocalStorage = value;
-          await this.plugin.saveSettings();
-        })
       );
   }
 }
