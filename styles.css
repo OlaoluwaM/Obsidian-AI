@@ -6,3 +6,42 @@ available in the app when your plugin is enabled.
 If your plugin does not need CSS, delete this file.
 
 */
+
+.ai-input-container {
+  background-color: var(--background-primary);
+  max-width: var(--file-line-width);
+  width: calc(var(--file-line-width) / 1.4);
+  padding: 0.5rem;
+  border-radius: var(--radius-m);
+  border: 1px solid var(--background-modifier-border);
+  box-shadow: var(--shadow-s);
+  z-index: var(--layer-notice);
+}
+
+.ai-input-content {
+  display: flex;
+}
+
+.ai-input-content textarea {
+  background: transparent;
+  border: medium none;
+  flex: 1 0 auto;
+  height: auto;
+  /* min-height: 1.3rem; */
+  resize: none;
+  box-shadow: none;
+  overflow: hidden;
+}
+
+#auto-grow-text-area-helper-elem {
+  min-height: 0;
+  max-height: none;
+  height: 0;
+  visibility: hidden;
+  overflow: hidden;
+  position: absolute;
+  z-index: -1000;
+  top: 0;
+  right: 0;
+  width: 100%;
+}
