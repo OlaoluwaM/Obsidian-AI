@@ -13,17 +13,18 @@ import {
   PluginSettingTab,
 } from "obsidian";
 
-import { Mutable } from "./types";
-import { roundDecimal } from "./utils";
-import { RootElemAttrs } from "./core";
-import { getPositionOfCurrentActiveLine, sendNotificationStr } from "./lib/obsidian";
+import type { Mutable } from "@typings/index";
+
+import { roundDecimal } from "@utils/index";
+import { RootElemAttrs } from "@core/types";
+import { makeRenderResourcesForAIInputElem } from "@features/ask-ai";
+import { getPositionOfCurrentActiveLine, sendNotificationStr } from "@lib/obsidian";
 import {
   Settings,
   isDefaultSettings,
   getSettingsFromLocalStorageSafely,
   saveSettingsIntoLocalStorageSafely,
-} from "./settings";
-import { makeRenderResourcesForAIInputElem } from "./features/ask-ai";
+} from "@settings/index";
 
 export default class ObsidianAI extends Plugin {
   settings: Mutable<Settings>;

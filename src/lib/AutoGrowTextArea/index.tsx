@@ -1,10 +1,12 @@
 import * as Effect from "@effect/io/Effect";
-import { ComponentPropsWithRef, forwardRef, useEffect, useRef } from "react";
 
 import { pipe } from "@effect/data/Function";
+import { ComponentPropsWithRef, forwardRef, useEffect, useRef } from "react";
+
 import calculateNodeHeight from "./calcNodeHeight";
 import getSizingData, { SizingData } from "./sizingData";
 
+// NOTE: We could perhaps look into making this a custom HTML element via web components
 type AutoGrowTextAreaProps = ComponentPropsWithRef<"textarea">;
 
 const AutoGrowTextArea = forwardRef<HTMLTextAreaElement, AutoGrowTextAreaProps>(
@@ -14,11 +16,11 @@ const AutoGrowTextArea = forwardRef<HTMLTextAreaElement, AutoGrowTextAreaProps>(
 
     useEffect(() => {
       sizingDataCache.current = Effect.runSync(
-        pipe(
+        Effect.flatMap(
           // Disabled because this element will always exist within this context
           // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           Effect.sync(() => document.getElementById("auto-grow-text-area")!),
-          Effect.flatMap(getSizingData)
+          getSizingData
         )
       );
     }, []);

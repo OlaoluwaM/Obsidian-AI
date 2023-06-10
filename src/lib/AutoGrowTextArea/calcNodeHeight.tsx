@@ -4,7 +4,7 @@
 import * as Effect from "@effect/io/Effect";
 
 import { pipe } from "@effect/data/Function";
-import getSizingData, { SizingData } from "./sizingData";
+import { SizingData } from "./sizingData";
 
 type CalculatedNodeHeights = [height: number, rowHeight: number];
 
@@ -30,43 +30,41 @@ export default function calculateNodeHeight(
   const MIN_ROWS = 1;
   const MAX_ROWS = Infinity;
 
+  const { paddingSize, borderSize, sizingStyle } = sizingData;
+  const { boxSizing } = sizingStyle;
+
   return (textAreaElem: HTMLTextAreaElement) =>
-    pipe(
-      Effect.sync(() => {
-        const { paddingSize, borderSize, sizingStyle } = sizingData;
-        const { boxSizing } = sizingStyle;
+    Effect.sync(() => {
+      // To ensure that the visible text area and hidden text area are equal in all sizing properties
+      Object.keys(sizingStyle).forEach(_key => {
+        const key = _key as keyof typeof sizingStyle;
+        hiddenTextAreaElem.style[key] = sizingStyle[key];
+      });
 
-        // To ensure that the visible text area and hidden text area are equal in all sizing properties
-        Object.keys(sizingStyle).forEach(_key => {
-          const key = _key as keyof typeof sizingStyle;
-          hiddenTextAreaElem.style[key] = sizingStyle[key];
-        });
+      const visibleTextAreaValue = textAreaElem.value;
 
-        const visibleTextAreaValue = textAreaElem.value;
+      hiddenTextAreaElem.value = visibleTextAreaValue;
+      let height = getTextAreaElemHeight(hiddenTextAreaElem, sizingData);
 
-        hiddenTextAreaElem.value = visibleTextAreaValue;
-        let height = getTextAreaElemHeight(hiddenTextAreaElem, sizingData);
+      hiddenTextAreaElem.value = "x";
+      const rowHeight = hiddenTextAreaElem.scrollHeight - paddingSize;
 
-        hiddenTextAreaElem.value = "x";
-        const rowHeight = hiddenTextAreaElem.scrollHeight - paddingSize;
+      let minHeight = rowHeight * MIN_ROWS;
 
-        let minHeight = rowHeight * MIN_ROWS;
+      if (boxSizing === "border-box") {
+        minHeight += paddingSize + borderSize;
+      }
 
-        if (boxSizing === "border-box") {
-          minHeight += paddingSize + borderSize;
-        }
+      height = Math.max(minHeight, height);
 
-        height = Math.max(minHeight, height);
+      let maxHeight = rowHeight * MAX_ROWS;
 
-        let maxHeight = rowHeight * MAX_ROWS;
+      if (boxSizing === "border-box") {
+        maxHeight += paddingSize + borderSize;
+      }
 
-        if (boxSizing === "border-box") {
-          maxHeight += paddingSize + borderSize;
-        }
+      height = Math.min(maxHeight, height);
 
-        height = Math.min(maxHeight, height);
-
-        return [height, rowHeight] satisfies CalculatedNodeHeights;
-      })
-    );
+      return [height, rowHeight] satisfies CalculatedNodeHeights;
+    });
 }

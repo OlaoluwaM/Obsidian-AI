@@ -1,6 +1,15 @@
 {
   "compilerOptions": {
     "baseUrl": ".",
+    "paths": {
+      "@assets/*": ["./src/assets/*"],
+      "@lib/*": ["./src/lib/*"],
+      "@core/*": ["./src/core/*"],
+      "@typings/*": ["./src/types/*"],
+      "@utils/*": ["./src/utils/*"],
+      "@features/*": ["./src/features/*"],
+      "@settings/*": ["./src/settings/*"]
+    },
     "inlineSourceMap": true,
     "inlineSources": true,
     "module": "ESNext",
@@ -14,10 +23,5 @@
     "lib": ["DOM", "ES5", "ES6", "ES7"],
     "jsx": "react-jsx"
   },
-  "include": [
-    "**/*.ts",
-    "**/*.tsx",
-    "src/features/ask-ai/components/index.tsx",
-    "src/main.tsx"
-  ]
+  "include": ["**/*.ts", "**/*.tsx", "src/main.tsx"]
 }

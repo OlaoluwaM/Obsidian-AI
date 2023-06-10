@@ -4,8 +4,8 @@ import * as O from "@effect/data/Option";
 import * as S from "@effect/schema/Schema";
 
 import { pipe } from "@effect/data/Function";
-import { AnySchema } from "src/lib/schema";
-import { smartStringify } from "src/utils";
+import { AnySchema } from "@lib/schema";
+import { smartStringify } from "@utils/index";
 
 export function getItemFromLocalStorageSafely<Sch extends AnySchema>(schema: Sch) {
   return (key: string) =>

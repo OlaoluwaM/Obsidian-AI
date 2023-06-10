@@ -27,7 +27,6 @@ If your plugin does not need CSS, delete this file.
   border: medium none;
   flex: 1 0 auto;
   height: auto;
-  /* min-height: 1.3rem; */
   resize: none;
   box-shadow: none;
   overflow: hidden;
