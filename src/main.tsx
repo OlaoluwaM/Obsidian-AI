@@ -1,7 +1,7 @@
 import * as Effect from "@effect/io/Effect";
 
 import { StrictMode } from "react";
-import { createRoot } from "react-dom/client";
+import { Root as ReactRoot, createRoot } from "react-dom/client";
 import { unmountComponentAtNode } from "react-dom";
 import {
   App,
@@ -13,11 +13,11 @@ import {
   PluginSettingTab,
 } from "obsidian";
 
-import type { Mutable } from "@typings/index";
+import type { Object } from "@typelevel/index";
 
 import { roundDecimal } from "@utils/index";
-import { RootElemAttrs } from "@core/types";
-import { makeRenderResourcesForAIInputElem } from "@features/ask-ai";
+import { RootElemAttrs } from "@core/index";
+import { makeRenderResourcesForAskAiInput } from "@features/ask-ai";
 import { getPositionOfCurrentActiveLine, sendNotificationStr } from "@lib/obsidian";
 import {
   Settings,
@@ -25,11 +25,12 @@ import {
   getSettingsFromLocalStorageSafely,
   saveSettingsIntoLocalStorageSafely,
 } from "@settings/index";
+import { LazyMotion, domMax } from "framer-motion";
 
 export default class ObsidianAI extends Plugin {
-  settings: Mutable<Settings>;
+  settings: Object.Mutable<Settings>;
 
-  AiInputRootElem?: HTMLDivElement;
+  uiRootElem: UIRootElem;
 
   async onload() {
     this.loadSettings();
@@ -62,9 +63,9 @@ export default class ObsidianAI extends Plugin {
       id: "ask-ai",
       name: "Ask AI",
       editorCallback: (e, m) => {
-        const { left, bottom } = Effect.runSync(getPositionOfCurrentActiveLine());
+        if (this.uiRootElem?.isMounted) return;
 
-        if (this.AiInputRootElem) return;
+        const { left, bottom } = Effect.runSync(getPositionOfCurrentActiveLine());
         const DIST_BETWEEN_ACTIVE_LINE_AND_ROOT_ELEM = 5;
 
         const roundToThreeDecimalPlaces = roundDecimal(3);
@@ -73,18 +74,29 @@ export default class ObsidianAI extends Plugin {
           style: `position: absolute; left: ${roundToThreeDecimalPlaces(left)}px; top: ${
             roundToThreeDecimalPlaces(bottom) + DIST_BETWEEN_ACTIVE_LINE_AND_ROOT_ELEM
           }px`,
+          id: "ask-ai-input-root-elem",
         };
 
         const { rootElem, UI } = Effect.runSync(
-          makeRenderResourcesForAIInputElem(rootElemAttrs)
+          makeRenderResourcesForAskAiInput(rootElemAttrs)
         );
 
-        this.AiInputRootElem = rootElem;
+        this.registerDomEvent(document, "click", () => this.uiRootElem.unmount(), {
+          once: true,
+        });
+
+        this.registerDomEvent(document, "root:unmount", () => this.uiRootElem.unmount(), {
+          once: true,
+        });
+
         const uiRoot = createRoot(rootElem);
+        this.uiRootElem = new UIRootElem(uiRoot, rootElem);
 
         uiRoot.render(
           <StrictMode>
-            <UI />
+            <LazyMotion features={domMax}>
+              <UI settings={this.settings} />
+            </LazyMotion>
           </StrictMode>
         );
       },
@@ -146,11 +158,7 @@ export default class ObsidianAI extends Plugin {
   }
 
   onunload() {
-    if (this.AiInputRootElem) {
-      unmountComponentAtNode(this.AiInputRootElem);
-      this.AiInputRootElem.remove();
-      this.AiInputRootElem = undefined;
-    }
+    this.uiRootElem.unmount();
   }
 
   loadSettings() {
@@ -163,6 +171,26 @@ export default class ObsidianAI extends Plugin {
     await this.saveData({
       message: "Settings are saved in local storage",
     });
+  }
+}
+
+class UIRootElem {
+  #reactRootElem: ReactRoot;
+
+  #DOMRootElem: HTMLElement;
+
+  isMounted = true;
+
+  constructor(reactRootElem: ReactRoot, domRootElem: HTMLElement) {
+    this.#reactRootElem = reactRootElem;
+    this.#DOMRootElem = domRootElem;
+  }
+
+  unmount() {
+    if (!this.isMounted) return;
+    this.#reactRootElem.unmount();
+    this.#DOMRootElem.remove();
+    this.isMounted = false;
   }
 }
 

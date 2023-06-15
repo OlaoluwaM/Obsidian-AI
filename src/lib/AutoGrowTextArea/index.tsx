@@ -39,10 +39,10 @@ const AutoGrowTextArea = forwardRef<HTMLTextAreaElement, AutoGrowTextAreaProps>(
 
           if (heightRef.current !== height) {
             heightRef.current = height;
-            textAreaElem.style.setProperty("height", `${height}px`, "important");
+            textAreaElem.style.setProperty("height", `${height}px`);
           }
 
-          return Effect.succeed("Success");
+          return Effect.succeed("New height set");
         })
       );
     };

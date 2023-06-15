@@ -12,6 +12,8 @@ export const settingsS = Schema.struct({
 
 export type Settings = Schema.To<typeof settingsS>;
 
+export type OpenAiAPIKey = Settings["openAiApiKey"];
+
 export const DEFAULT_SETTINGS = {
   openAiApiKey: DEFAULT_OPEN_AI_API_KEY,
 } satisfies Settings;
