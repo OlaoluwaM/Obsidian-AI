@@ -2,7 +2,7 @@ import * as Effect from "@effect/io/Effect";
 
 import { pipe } from "@effect/data/Function";
 
-import { AnyObject } from "@typelevel/index";
+import { AnyObject } from "@lib/typelevel/index";
 import { mergeRootElemAttrs } from "./helpers";
 
 type ReactComponent = (props: AnyObject) => JSX.Element;

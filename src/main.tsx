@@ -13,7 +13,7 @@ import {
   PluginSettingTab,
 } from "obsidian";
 
-import type { Object } from "@typelevel/index";
+import type { Object } from "@lib/typelevel/index";
 
 import { roundDecimal } from "@utils/index";
 import { RootElemAttrs } from "@core/index";

@@ -5,11 +5,11 @@
       "@assets/*": ["./src/assets/*"],
       "@lib/*": ["./src/lib/*"],
       "@core/*": ["./src/core/*"],
-      "@typelevel/*": ["./src/typelevel/*"],
+      "@typelevel/*": ["src/lib/typelevel/*"],
       "@utils/*": ["./src/utils/*"],
       "@features/*": ["./src/features/*"],
       "@settings/*": ["./src/settings/*"],
-      "@typings/*": ["./src/core/types/*"]
+      "@typings/*": ["src/types/*"]
     },
     "inlineSourceMap": true,
     "inlineSources": true,
